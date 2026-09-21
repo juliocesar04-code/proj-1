@@ -1,0 +1,19 @@
+{
+  "name": "traceforge",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "concurrently -n api,web -c auto \"npm run dev -w @traceforge/api\" \"npm run dev -w @traceforge/web\"",
+    "build": "npm run build -w @traceforge/api && npm run build -w @traceforge/web",
+    "typecheck": "npm run typecheck -w @traceforge/api && npm run typecheck -w @traceforge/web",
+    "test": "npm run test -w @traceforge/api",
+    "db:init": "npm run db:init -w @traceforge/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
