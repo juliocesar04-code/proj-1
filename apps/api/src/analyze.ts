@@ -10,6 +10,8 @@ import type {
 const round = (value: number, digits = 2) =>
   Number(value.toFixed(digits));
 
+const spanKey = (traceId: string, spanId: string) => traceId + ":" + spanId;
+
 function percentile(values: number[], p: number): number {
   if (values.length === 0) return 0;
   const sorted = [...values].sort((a, b) => a - b);
@@ -58,7 +60,8 @@ function depthOf(
   byId: Map<string, Span>,
   memo: Map<string, number>,
 ): number {
-  const key = spanKey(span.traceId, span.spanId);\n  const cached = memo.get(key);
+  const key = spanKey(span.traceId, span.spanId);
+  const cached = memo.get(key);
   if (cached !== undefined) return cached;
 
   if (!span.parentSpanId) {
@@ -78,12 +81,15 @@ function depthOf(
 }
 
 export function analyzeSpans(spans: Span[]): AnalyzedSpan[] {
-  const byId = new Map(\n    spans.map((span) => [spanKey(span.traceId, span.spanId), span]),\n  );
+  const byId = new Map(
+    spans.map((span) => [spanKey(span.traceId, span.spanId), span]),
+  );
   const children = new Map<string, Span[]>();
 
   for (const span of spans) {
     if (!span.parentSpanId) continue;
-    const parentKey = spanKey(span.traceId, span.parentSpanId);\n    const bucket = children.get(parentKey) ?? [];
+    const parentKey = spanKey(span.traceId, span.parentSpanId);
+    const bucket = children.get(parentKey) ?? [];
     bucket.push(span);
     children.set(parentKey, bucket);
   }
@@ -95,7 +101,8 @@ export function analyzeSpans(spans: Span[]): AnalyzedSpan[] {
     .map((span) => {
       const start = span.startMs;
       const end = span.startMs + span.durationMs;
-      const directChildren =\n        children.get(spanKey(span.traceId, span.spanId)) ?? [];
+      const directChildren =
+        children.get(spanKey(span.traceId, span.spanId)) ?? [];
 
       const covered = unionLength(
         directChildren.map((child) => ({
@@ -117,7 +124,9 @@ export function buildServiceGraph(spans: AnalyzedSpan[]): {
   services: ServiceNode[];
   edges: ServiceEdge[];
 } {
-  const byId = new Map(\n    spans.map((span) => [spanKey(span.traceId, span.spanId), span]),\n  );
+  const byId = new Map(
+    spans.map((span) => [spanKey(span.traceId, span.spanId), span]),
+  );
   const serviceBuckets = new Map<string, AnalyzedSpan[]>();
   const edgeBuckets = new Map<string, AnalyzedSpan[]>();
 
