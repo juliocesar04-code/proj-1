@@ -10,6 +10,7 @@ import type {
   ServiceEdge,
   ServiceNode,
 } from "../api.js";
+import { useI18n } from "../i18n.js";
 
 interface ServiceMapProps {
   services: ServiceNode[];
@@ -17,28 +18,12 @@ interface ServiceMapProps {
   suspectedService?: string | undefined;
 }
 
-function serviceLabel(service: ServiceNode, suspected: boolean) {
-  return (
-    <div className="service-node__content">
-      <div className="service-node__topline">
-        <span className="service-node__name">{service.service}</span>
-        {suspected ? (
-          <span className="service-node__badge">suspect</span>
-        ) : null}
-      </div>
-      <div className="service-node__metrics">
-        <span>{service.p95Ms.toFixed(0)} ms p95</span>
-        <span>{(service.errorRate * 100).toFixed(1)}% err</span>
-      </div>
-    </div>
-  );
-}
-
 export function ServiceMap({
   services,
   edges,
   suspectedService,
 }: ServiceMapProps) {
+  const { t, formatNumber } = useI18n();
   const radius = Math.max(170, services.length * 34);
   const center = radius + 80;
 
@@ -54,7 +39,33 @@ export function ServiceMap({
         y: center + Math.sin(angle) * radius,
       },
       data: {
-        label: serviceLabel(service, suspected),
+        label: (
+          <div className="service-node__content">
+            <div className="service-node__topline">
+              <span className="service-node__name">{service.service}</span>
+              {suspected ? (
+                <span className="service-node__badge">
+                  {t("service.suspect")}
+                </span>
+              ) : null}
+            </div>
+            <div className="service-node__metrics">
+              <span>
+                {formatNumber(service.p95Ms, {
+                  maximumFractionDigits: 0,
+                })}{" "}
+                ms p95
+              </span>
+              <span>
+                {formatNumber(service.errorRate * 100, {
+                  minimumFractionDigits: 1,
+                  maximumFractionDigits: 1,
+                })}
+                % {t("service.err")}
+              </span>
+            </div>
+          </div>
+        ),
       },
       draggable: false,
       selectable: true,
@@ -72,9 +83,13 @@ export function ServiceMap({
     id: edge.source + "->" + edge.target,
     source: edge.source,
     target: edge.target,
-    label: edge.calls + " calls",
+    label: t("service.calls", {
+      count: formatNumber(edge.calls),
+    }),
     animated: edge.errors > 0,
-    className: edge.errors > 0 ? "service-edge service-edge--error" : "service-edge",
+    className: edge.errors > 0
+      ? "service-edge service-edge--error"
+      : "service-edge",
     markerEnd: {
       type: MarkerType.ArrowClosed,
     },
@@ -83,13 +98,13 @@ export function ServiceMap({
   if (services.length === 0) {
     return (
       <div className="empty-state empty-state--map">
-        Run a scenario or ingest spans to build the service graph.
+        {t("service.empty")}
       </div>
     );
   }
 
   return (
-    <div className="service-map" aria-label="Service dependency map">
+    <div className="service-map" aria-label={t("service.aria")}>
       <ReactFlow
         nodes={nodes}
         edges={flowEdges}
