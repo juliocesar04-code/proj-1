@@ -1,3 +1,5 @@
+import { demoOverview, demoTrace, demoTraces } from "./demo.js";
+
 export type SpanStatus = "ok" | "error" | "unset";
 
 export interface ServiceNode {
@@ -86,6 +88,11 @@ const apiBase =
   (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "") ??
   "http://localhost:4000";
 
+const demoMode =
+  import.meta.env.VITE_DEMO === "true" ||
+  (typeof window !== "undefined" &&
+    window.location.hostname.endsWith(".vercel.app"));
+
 async function request<T>(
   path: string,
   init?: RequestInit,
@@ -113,34 +120,65 @@ async function request<T>(
 }
 
 export const api = {
-  overview: () => request<Overview>("/api/overview"),
+  overview: () =>
+    demoMode
+      ? Promise.resolve(demoOverview)
+      : request<Overview>("/api/overview"),
 
   traces: (limit = 80) =>
-    request<{ traces: TraceSummary[] }>(
-      "/api/traces?limit=" + encodeURIComponent(String(limit)),
-    ),
+    demoMode
+      ? Promise.resolve({ traces: demoTraces.slice(0, limit) })
+      : request<{ traces: TraceSummary[] }>(
+          "/api/traces?limit=" + encodeURIComponent(String(limit)),
+        ),
 
   trace: (traceId: string) =>
-    request<TraceAnalysis>(
-      "/api/traces/" + encodeURIComponent(traceId),
-    ),
+    demoMode
+      ? Promise.resolve({ ...demoTrace, traceId })
+      : request<TraceAnalysis>(
+          "/api/traces/" + encodeURIComponent(traceId),
+        ),
 
   runScenario: (scenario: ScenarioId, traces = 24) =>
-    request<{
-      scenario: ScenarioId;
-      spans: number;
-      traces: number;
-    }>("/api/scenarios/" + scenario + "/run", {
-      method: "POST",
-      body: JSON.stringify({ traces }),
-    }),
+    demoMode
+      ? Promise.resolve({
+          scenario,
+          spans: traces * 7,
+          traces,
+        })
+      : request<{
+          scenario: ScenarioId;
+          spans: number;
+          traces: number;
+        }>("/api/scenarios/" + scenario + "/run", {
+          method: "POST",
+          body: JSON.stringify({ traces }),
+        }),
 
   clear: () =>
-    request<void>("/api/data", {
-      method: "DELETE",
-    }),
+    demoMode
+      ? Promise.resolve()
+      : request<void>("/api/data", {
+          method: "DELETE",
+        }),
 
   events(onRefresh: () => void) {
+    if (demoMode) {
+      const source = {
+        onopen: null as ((event: Event) => void) | null,
+        onerror: null as ((event: Event) => void) | null,
+        addEventListener: () => undefined,
+        close: () => undefined,
+      } as unknown as EventSource;
+
+      window.setTimeout(() => {
+        source.onopen?.(new Event("open"));
+        onRefresh();
+      }, 0);
+
+      return source;
+    }
+
     const source = new EventSource(apiBase + "/api/events");
 
     for (const event of ["ingest", "scenario", "reset"]) {
