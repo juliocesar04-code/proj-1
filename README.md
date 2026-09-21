@@ -65,6 +65,21 @@ apps/
   web/   topology, traces, timeline and replay UI
 ```
 
-## Status
+## Current status
 
-Core trace model, persistence, analysis, scenario engine and responsive explorer are being implemented first. Exportable incident reports and OpenTelemetry ingestion are the next milestones.
+The working core is implemented:
+
+- PostgreSQL-backed span ingestion
+- Typed validation for incoming trace data
+- Service graph reconstruction
+- Self-time calculation with overlapping child spans handled correctly
+- Evidence-ranked incident hypotheses
+- Live SSE refresh after ingestion, scenario changes, and resets
+- Trace search and error filtering
+- Interactive dependency map
+- Request timeline with play, pause, restart, and manual scrubbing
+- Four reproducible failure scenarios
+- Responsive desktop, tablet, and mobile interface
+- Automated type checking, unit tests, and production build in GitHub Actions
+
+The next milestones are native OpenTelemetry ingestion and exportable incident reports.
