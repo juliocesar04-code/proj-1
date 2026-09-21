@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>TraceForge Preview</title>
+<style>
+:root{color-scheme:dark;--bg:#07100f;--panel:#0e1b19;--panel2:#122320;--line:rgba(155,190,180,.16);--text:#e8f3ef;--muted:#89a29b;--mint:#7df3c3;--red:#ff6f71;--amber:#ffcb66}
+*{box-sizing:border-box}body{margin:0;background:
+radial-gradient(circle at 15% -10%,rgba(62,233,164,.12),transparent 34rem),
+linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px),var(--bg);
+background-size:auto,32px 32px,32px 32px;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+header{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--line);background:rgba(7,16,15,.88);backdrop-filter:blur(18px)}
+.brand{display:flex;gap:12px;align-items:center}.mark{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(125,243,195,.35);border-radius:11px;background:rgba(125,243,195,.08);color:var(--mint);font-weight:800}.brand b{display:block}.brand small,.status{font:10px ui-monospace,monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.status{display:flex;gap:8px;align-items:center}.dot{width:7px;height:7px;border-radius:50%;background:#3ee9a4;box-shadow:0 0 12px #3ee9a4}
+main{width:min(1460px,calc(100% - 28px));margin:auto;padding:44px 0 34px}.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:end;padding-bottom:34px}.eyebrow{margin:0 0 10px;color:var(--mint);font:700 10px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase}.hero h1{margin:0;font-size:clamp(46px,6vw,86px);line-height:.94;letter-spacing:-.06em;font-weight:650}.hero p.copy{max-width:670px;color:var(--muted);line-height:1.7;font-size:15px}.scenarios{display:grid;grid-template-columns:1fr 1fr;gap:10px}.scenario,.card,.panel{border:1px solid var(--line);background:linear-gradient(145deg,rgba(255,255,255,.04),rgba(255,255,255,.01)),rgba(14,27,25,.86);border-radius:14px}.scenario{padding:16px;min-height:86px}.scenario b{display:block;font-size:13px}.scenario small{color:var(--muted);font-size:10px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{padding:16px}.card span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em}.card strong{display:block;margin-top:4px;font:600 24px ui-monospace,monospace}.card small{color:var(--muted);font-size:10px}.grid{display:grid;grid-template-columns:1.65fr .75fr;gap:12px;margin-top:12px}.panel{overflow:hidden}.head{display:flex;justify-content:space-between;align-items:center;padding:17px 19px;border-bottom:1px solid var(--line)}.head h2{margin:0;font-size:16px}.map{position:relative;height:440px;background:radial-gradient(circle at center,rgba(125,243,195,.05),transparent 58%),#091311;overflow:hidden}.node{position:absolute;width:155px;padding:12px;border:1px solid rgba(125,243,195,.28);border-radius:11px;background:#0e1b19;box-shadow:0 14px 30px rgba(0,0,0,.3)}.node b{font:700 10px ui-monospace,monospace}.node small{display:flex;justify-content:space-between;margin-top:8px;color:var(--muted);font:8px ui-monospace,monospace}.node.suspect{border-color:var(--amber)}.node.err{border-color:rgba(255,111,113,.55)}.n1{left:8%;top:43%}.n2{left:35%;top:10%}.n3{left:35%;top:68%}.n4{right:8%;top:18%}.n5{right:8%;top:62%}.edge{position:absolute;height:1px;background:rgba(125,243,195,.32);transform-origin:left center}.e1{left:20%;top:47%;width:29%;transform:rotate(-30deg)}.e2{left:20%;top:48%;width:30%;transform:rotate(28deg)}.e3{left:47%;top:25%;width:34%;transform:rotate(-3deg)}.e4{left:47%;top:73%;width:34%;transform:rotate(-5deg);background:rgba(255,111,113,.45)}.hyp{padding:20px}.lead{display:flex;gap:12px}.icon{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:rgba(255,111,113,.12);color:var(--red);font-weight:800}.lead h3{margin:0 0 4px;font:700 19px ui-monospace,monospace}.lead p{margin:0;color:var(--muted);font-size:11px}.evidence{margin-top:16px;display:grid;gap:8px}.ev{padding:10px;border:1px solid var(--line);border-radius:10px;color:#b7cac4;font-size:11px;line-height:1.5}.explorer{display:grid;grid-template-columns:.75fr 1.25fr;gap:12px;margin-top:12px}.trace-list{padding:0}.trace{display:grid;grid-template-columns:8px 1fr auto;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}.trace.active{background:rgba(125,243,195,.05);box-shadow:inset 2px 0 var(--mint)}.trace .d{width:7px;height:7px;border-radius:50%;background:var(--mint)}.trace .d.red{background:var(--red)}.trace b{font-size:11px}.trace small{display:block;color:var(--muted);font-size:9px}.ms{font:10px ui-monospace,monospace}.timeline{padding:14px 16px 18px}.barrow{display:grid;grid-template-columns:145px 1fr 58px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:9px}.track{position:relative;height:20px;background:linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:20% 100%}.bar{position:absolute;top:6px;height:8px;border-radius:99px;background:linear-gradient(90deg,#42dba0,var(--mint))}.bar.red{background:linear-gradient(90deg,#e44d55,var(--red))}.scrub{height:5px;border-radius:99px;background:#1b312d;margin:8px 0 16px;position:relative}.scrub:before{content:"";position:absolute;left:0;top:0;bottom:0;width:61%;border-radius:99px;background:var(--mint)}.scrub:after{content:"";position:absolute;left:61%;top:50%;width:10px;height:10px;border-radius:50%;background:#fff;transform:translate(-50%,-50%)}footer{display:flex;justify-content:space-between;width:min(1460px,calc(100% - 28px));margin:auto;padding:20px 0 30px;border-top:1px solid var(--line);color:#617a73;font:9px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.06em}
+@media(max-width:1050px){.hero,.grid,.explorer{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.scenarios{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){header{padding:12px 14px}.status{display:none}main{padding-top:26px}.hero{gap:26px}.hero h1{font-size:44px}.scenarios{grid-template-columns:1fr}.metrics{gap:8px}.card{padding:12px}.map{height:360px}.node{width:120px;padding:9px}.n1{left:4%;top:42%}.n2{left:33%;top:10%}.n3{left:33%;top:70%}.n4{right:3%;top:19%}.n5{right:3%;top:63%}.barrow{min-width:620px}.timeline{overflow:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="mark">TF</div><div><b>TraceForge</b><small>incident workbench</small></div></div>
+  <div class="status"><span class="dot"></span> live <span>·</span> preview data</div>
+</header>
+<main>
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Distributed systems observability</p>
+      <h1>Find where the request really broke.</h1>
+      <p class="copy">Reconstruct service calls, remove parallel wait time, replay traces, and rank incident hypotheses using the evidence already inside each span.</p>
+    </div>
+    <div class="scenarios">
+      <div class="scenario"><b>Stable</b><small>Healthy baseline</small></div>
+      <div class="scenario"><b>Payment timeout</b><small>Slow failing payment calls</small></div>
+      <div class="scenario"><b>Database lock</b><small>Blocked transaction path</small></div>
+      <div class="scenario"><b>Cache degradation</b><small>Redis latency and fallback</small></div>
+    </div>
+  </section>
+
+  <section class="metrics">
+    <div class="card"><span>Traces</span><strong>24</strong><small>168 spans loaded</small></div>
+    <div class="card"><span>Services</span><strong>7</strong><small>6 dependencies</small></div>
+    <div class="card"><span>Error rate</span><strong>9.5%</strong><small>16 failing spans</small></div>
+    <div class="card"><span>Top p95</span><strong>2.24 s</strong><small>payment</small></div>
+  </section>
+
+  <section class="grid">
+    <div class="panel">
+      <div class="head"><div><p class="eyebrow">Live topology</p><h2>Service map</h2></div><small>6 edges</small></div>
+      <div class="map">
+        <span class="edge e1"></span><span class="edge e2"></span><span class="edge e3"></span><span class="edge e4"></span>
+        <div class="node n1"><b>edge-gateway</b><small><span>640 ms p95</span><span>0% err</span></small></div>
+        <div class="node n2"><b>catalog</b><small><span>151 ms p95</span><span>0% err</span></small></div>
+        <div class="node n3 suspect err"><b>payment</b><small><span>2240 ms p95</span><span>33% err</span></small></div>
+        <div class="node n4"><b>redis</b><small><span>22 ms p95</span><span>0% err</span></small></div>
+        <div class="node n5"><b>postgres</b><small><span>79 ms p95</span><span>0% err</span></small></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="head"><div><p class="eyebrow">Evidence ranking</p><h2>Incident hypothesis</h2></div></div>
+      <div class="hyp">
+        <div class="lead"><div class="icon">!</div><div><p class="eyebrow">Leading hypothesis</p><h3>payment</h3><p>Evidence score 89.4 · high confidence</p></div></div>
+        <div class="evidence">
+          <div class="ev">8/24 spans ended in error (33.3%).</div>
+          <div class="ev">p95 latency reached 2240 ms.</div>
+          <div class="ev">41 ms were spent inside the service after removing overlapping child calls.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="explorer">
+    <div class="panel trace-list">
+      <div class="head"><div><p class="eyebrow">Request explorer</p><h2>Recent traces</h2></div></div>
+      <div class="trace active"><span class="d red"></span><div><b>POST /checkout</b><small>edge-gateway · 7 spans</small></div><span class="ms">2410 ms</span></div>
+      <div class="trace"><span class="d"></span><div><b>POST /checkout</b><small>edge-gateway · 7 spans</small></div><span class="ms">658 ms</span></div>
+      <div class="trace"><span class="d"></span><div><b>POST /checkout</b><small>edge-gateway · 7 spans</small></div><span class="ms">611 ms</span></div>
+      <div class="trace"><span class="d red"></span><div><b>POST /checkout</b><small>edge-gateway · 7 spans</small></div><span class="ms">2362 ms</span></div>
+      <div class="trace"><span class="d"></span><div><b>POST /checkout</b><small>edge-gateway · 7 spans</small></div><span class="ms">626 ms</span></div>
+    </div>
+    <div class="panel">
+      <div class="head"><div><p class="eyebrow">Selected request</p><h2>Failure replay</h2></div><small>trace 8fe7d1b2</small></div>
+      <div class="timeline">
+        <div class="scrub"></div>
+        <div class="barrow"><span>edge-gateway</span><div class="track"><span class="bar red" style="left:0;width:100%"></span></div><span>2410 ms</span></div>
+        <div class="barrow"><span>auth</span><div class="track"><span class="bar" style="left:1%;width:3%"></span></div><span>41 ms</span></div>
+        <div class="barrow"><span>catalog</span><div class="track"><span class="bar" style="left:3%;width:7%"></span></div><span>151 ms</span></div>
+        <div class="barrow"><span>redis</span><div class="track"><span class="bar" style="left:4%;width:2%"></span></div><span>21 ms</span></div>
+        <div class="barrow"><span>cart</span><div class="track"><span class="bar" style="left:4%;width:6%"></span></div><span>133 ms</span></div>
+        <div class="barrow"><span>payment</span><div class="track"><span class="bar red" style="left:10%;width:84%"></span></div><span>2240 ms</span></div>
+        <div class="barrow"><span>postgres</span><div class="track"><span class="bar" style="left:12%;width:4%"></span></div><span>79 ms</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><span>TraceForge</span><span>evidence-first analysis · responsive preview</span></footer>
+</body>
+</html>
