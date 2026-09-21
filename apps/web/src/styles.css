@@ -48,7 +48,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -63,7 +64,8 @@ a {
 
 button:focus-visible,
 a:focus-visible,
-input:focus-visible {
+input:focus-visible,
+select:focus-visible {
   outline: 2px solid var(--mint);
   outline-offset: 3px;
 }
@@ -77,7 +79,7 @@ input:focus-visible {
   top: 0;
   z-index: 50;
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
+  grid-template-columns: minmax(220px, 1fr) auto auto minmax(110px, auto);
   align-items: center;
   min-height: 72px;
   padding: 12px clamp(18px, 4vw, 56px);
@@ -157,6 +159,39 @@ input:focus-visible {
   height: 14px;
   margin: 0 4px;
   background: var(--line-strong);
+}
+
+.language-picker {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: 18px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--muted);
+}
+
+.language-picker svg {
+  flex: 0 0 auto;
+  color: var(--mint);
+}
+
+.language-picker select {
+  max-width: 156px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.language-picker option {
+  background: var(--panel-solid);
+  color: var(--text);
 }
 
 .ghost-button,
@@ -259,7 +294,7 @@ main {
   background:
     linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012)),
     var(--panel);
-  text-align: left;
+  text-align: start;
   cursor: pointer;
   transition:
     transform 160ms ease,
@@ -737,7 +772,7 @@ main {
   border-bottom: 1px solid var(--line);
   background: transparent;
   color: var(--text);
-  text-align: left;
+  text-align: start;
   cursor: pointer;
   transition: background-color 120ms ease;
 }
@@ -809,7 +844,7 @@ main {
 
 .trace-row__stamp {
   min-width: 60px;
-  text-align: right;
+  text-align: end;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
@@ -1105,11 +1140,15 @@ footer {
 
 @media (max-width: 860px) {
   .topbar {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
   }
 
   .topbar__status {
     display: none;
+  }
+
+  .language-picker {
+    margin-inline-start: 0;
   }
 
   main {
@@ -1137,13 +1176,30 @@ footer {
 
 @media (max-width: 580px) {
   .topbar {
+    grid-template-columns: 1fr auto auto;
     min-height: 64px;
+    gap: 7px;
     padding: 10px 14px;
   }
 
   .brand small,
   .ghost-button span {
     display: none;
+  }
+
+  .language-picker {
+    min-height: 36px;
+    padding: 0 8px;
+  }
+
+  .language-picker select {
+    width: 34px;
+    max-width: 34px;
+    color: transparent;
+  }
+
+  .language-picker select option {
+    color: var(--text);
   }
 
   .ghost-button {
@@ -1248,4 +1304,17 @@ footer {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+[dir="rtl"] .scenario-button svg {
+  grid-column: 2;
+}
+
+[dir="rtl"] .trace-row--selected {
+  box-shadow: inset -2px 0 var(--mint);
+}
+
+[dir="rtl"] .service-node__content,
+[dir="rtl"] .react-flow__edge-text {
+  direction: rtl;
 }
