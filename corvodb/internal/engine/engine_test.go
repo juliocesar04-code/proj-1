@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/juliocesar04-code/proj-1/internal/types"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/types"
 )
 
 type harness struct {

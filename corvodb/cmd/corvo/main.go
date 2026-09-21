@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/juliocesar04-code/proj-1/internal/engine"
-	"github.com/juliocesar04-code/proj-1/internal/types"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/engine"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/types"
 )
 
 const version = "0.1.0"

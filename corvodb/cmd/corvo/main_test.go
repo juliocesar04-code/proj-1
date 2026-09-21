@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/juliocesar04-code/proj-1/internal/engine"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/engine"
 )
 
 func newShell(t *testing.T) (*shell, *strings.Builder) {

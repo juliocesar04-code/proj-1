@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/juliocesar04-code/proj-1/internal/types"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/types"
 )
 
 // Kind classifies a token.

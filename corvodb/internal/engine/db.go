@@ -9,9 +9,9 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/juliocesar04-code/proj-1/internal/sql"
-	"github.com/juliocesar04-code/proj-1/internal/storage"
-	"github.com/juliocesar04-code/proj-1/internal/types"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/sql"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/storage"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/types"
 )
 
 // Errors reported by the engine.

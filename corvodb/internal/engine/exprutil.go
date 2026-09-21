@@ -3,7 +3,7 @@ package engine
 import (
 	"strings"
 
-	"github.com/juliocesar04-code/proj-1/internal/sql"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/sql"
 )
 
 // walkExpr visits every node of an expression. When fn returns false the

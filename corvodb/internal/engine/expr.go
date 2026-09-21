@@ -5,8 +5,8 @@ import (
 	"math"
 	"strings"
 
-	"github.com/juliocesar04-code/proj-1/internal/sql"
-	"github.com/juliocesar04-code/proj-1/internal/types"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/sql"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/types"
 )
 
 // Row is one tuple flowing through the operator tree.

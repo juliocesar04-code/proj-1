@@ -3,7 +3,7 @@ package sql
 import (
 	"strings"
 
-	"github.com/juliocesar04-code/proj-1/internal/types"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/types"
 )
 
 // Parse reads every statement in the input. Statements are separated by

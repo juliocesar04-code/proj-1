@@ -6,8 +6,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/juliocesar04-code/proj-1/internal/storage"
-	"github.com/juliocesar04-code/proj-1/internal/types"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/storage"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/types"
 )
 
 // The schema lives in its own B+Tree, whose root page is recorded in the

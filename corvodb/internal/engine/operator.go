@@ -6,9 +6,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/juliocesar04-code/proj-1/internal/sql"
-	"github.com/juliocesar04-code/proj-1/internal/storage"
-	"github.com/juliocesar04-code/proj-1/internal/types"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/sql"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/storage"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/types"
 )
 
 // Operator is one node of the execution plan. The engine uses the iterator

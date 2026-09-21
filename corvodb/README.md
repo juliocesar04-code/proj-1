@@ -74,7 +74,7 @@ corvo> EXPLAIN SELECT id, total FROM pedidos WHERE status = 'pendente';
 ## Instalação
 
 ```sh
-go install github.com/juliocesar04-code/proj-1/cmd/corvo@latest
+go install github.com/juliocesar04-code/proj-1/corvodb/cmd/corvo@latest
 ```
 
 Ou, a partir do repositório clonado:

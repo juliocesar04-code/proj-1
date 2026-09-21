@@ -5,9 +5,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/juliocesar04-code/proj-1/internal/sql"
-	"github.com/juliocesar04-code/proj-1/internal/storage"
-	"github.com/juliocesar04-code/proj-1/internal/types"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/sql"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/storage"
+	"github.com/juliocesar04-code/proj-1/corvodb/internal/types"
 )
 
 // planner turns a parsed SELECT into a tree of operators.
