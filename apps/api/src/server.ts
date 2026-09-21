@@ -277,7 +277,9 @@ app.setErrorHandler((error, _request, reply) => {
     message:
       process.env.NODE_ENV === "production"
         ? "Unexpected server error."
-        : error.message,
+        : error instanceof Error
+          ? error.message
+          : "Unknown server error.",
   });
 });
 
