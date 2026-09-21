@@ -2284,3 +2284,51 @@ footer {
     margin-inline: 12px;
   }
 }
+
+
+.timeline-diagnostics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0 18px 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--line);
+}
+
+.timeline-diagnostics article {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  padding: 11px 12px;
+  background: rgba(9, 19, 17, 0.96);
+}
+
+.timeline-diagnostics small {
+  color: var(--muted-2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.timeline-diagnostics strong {
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline-diagnostics span {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8px;
+}
+
+@media (max-width: 700px) {
+  .timeline-diagnostics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-inline: 12px;
+  }
+}
