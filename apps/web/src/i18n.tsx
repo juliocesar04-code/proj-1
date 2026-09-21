@@ -1,3 +1,4 @@
+import { advancedTranslations } from "./advancedTranslations.js";
 import {
   createContext,
   useContext,
@@ -1221,7 +1222,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     const t = (
       key: string,
       values?: Record<string, string | number>,
-    ) => interpolate(dictionary[key] ?? en[key] ?? key, values);
+    ) =>
+      interpolate(
+        advancedTranslations[locale][key] ??
+          dictionary[key] ??
+          advancedTranslations.en[key] ??
+          en[key] ??
+          key,
+        values,
+      );
 
     const formatNumber = (
       number: number,
