@@ -4,6 +4,7 @@ import {
   Gauge,
 } from "lucide-react";
 import type { IncidentHypothesis } from "../api.js";
+import { useI18n } from "../i18n.js";
 
 interface HypothesisPanelProps {
   hypotheses: IncidentHypothesis[];
@@ -12,12 +13,13 @@ interface HypothesisPanelProps {
 export function HypothesisPanel({
   hypotheses,
 }: HypothesisPanelProps) {
+  const { t, formatNumber, evidenceText } = useI18n();
   const top = hypotheses[0];
 
   if (!top) {
     return (
       <div className="empty-state">
-        No incident evidence yet.
+        {t("hyp.none")}
       </div>
     );
   }
@@ -45,11 +47,17 @@ export function HypothesisPanel({
         </div>
         <div>
           <p className="eyebrow">
-            {calm ? "Current signal" : "Leading hypothesis"}
+            {calm ? t("hyp.currentSignal") : t("hyp.leading")}
           </p>
           <h3>{top.service}</h3>
           <p>
-            Evidence score {top.score.toFixed(1)} · {top.confidence} confidence
+            {t("hyp.score", {
+              score: formatNumber(top.score, {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1,
+              }),
+              confidence: t("confidence." + top.confidence),
+            })}
           </p>
         </div>
       </div>
@@ -58,7 +66,7 @@ export function HypothesisPanel({
         {top.evidence.map((evidence) => (
           <div className="evidence-item" key={evidence}>
             <Gauge size={15} />
-            <span>{evidence}</span>
+            <span>{evidenceText(evidence)}</span>
           </div>
         ))}
       </div>
@@ -72,7 +80,12 @@ export function HypothesisPanel({
             >
               <span>0{index + 2}</span>
               <strong>{hypothesis.service}</strong>
-              <small>{hypothesis.score.toFixed(1)}</small>
+              <small>
+                {formatNumber(hypothesis.score, {
+                  minimumFractionDigits: 1,
+                  maximumFractionDigits: 1,
+                })}
+              </small>
             </div>
           ))}
         </div>
