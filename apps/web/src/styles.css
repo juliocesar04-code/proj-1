@@ -2091,3 +2091,196 @@ footer {
     overflow: auto;
   }
 }
+
+
+.service-inspector {
+  width: min(520px, 100%);
+}
+
+.service-inspector__score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 18px;
+  padding: 15px 16px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background:
+    linear-gradient(135deg, rgba(125, 243, 195, 0.06), transparent),
+    rgba(255, 255, 255, 0.018);
+}
+
+.service-inspector__score small {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--muted-2);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.service-inspector__score strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 24px;
+}
+
+.service-inspector__confidence {
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.service-inspector__confidence--high {
+  border-color: rgba(255, 111, 113, 0.28);
+  background: rgba(255, 111, 113, 0.08);
+  color: #ffb0b1;
+}
+
+.service-inspector__confidence--medium {
+  border-color: rgba(255, 203, 102, 0.28);
+  background: rgba(255, 203, 102, 0.07);
+  color: var(--amber);
+}
+
+.service-inspector__confidence--low {
+  border-color: rgba(125, 243, 195, 0.22);
+  background: rgba(125, 243, 195, 0.06);
+  color: var(--mint);
+}
+
+.service-inspector__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0 18px 12px;
+}
+
+.service-inspector__metrics article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 9px;
+  align-items: center;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.014);
+}
+
+.service-inspector__metrics svg {
+  grid-row: 1 / span 2;
+  color: var(--mint);
+}
+
+.service-inspector__metrics small {
+  color: var(--muted-2);
+  font-size: 8px;
+  text-transform: uppercase;
+}
+
+.service-inspector__metrics strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.service-inspector__self {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 18px 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(125, 243, 195, 0.16);
+  border-radius: 11px;
+  background: rgba(125, 243, 195, 0.035);
+}
+
+.service-inspector__self span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.service-inspector__self strong {
+  color: var(--mint);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.dependency-section {
+  margin: 0 18px 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.dependency-section__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dependency-section__title svg {
+  color: var(--mint);
+}
+
+.dependency-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dependency-row:last-child {
+  border-bottom: 0;
+}
+
+.dependency-row strong {
+  font-size: 10px;
+}
+
+.dependency-row span {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8px;
+}
+
+.dependency-empty {
+  padding: 18px 13px;
+  color: var(--muted-2);
+  font-size: 9px;
+  text-align: center;
+}
+
+.service-node {
+  cursor: pointer !important;
+}
+
+.service-node:hover {
+  border-color: rgba(125, 243, 195, 0.48) !important;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 580px) {
+  .service-inspector__metrics {
+    grid-template-columns: 1fr 1fr;
+    padding-inline: 12px;
+  }
+
+  .service-inspector__score,
+  .service-inspector__self,
+  .dependency-section {
+    margin-inline: 12px;
+  }
+}
