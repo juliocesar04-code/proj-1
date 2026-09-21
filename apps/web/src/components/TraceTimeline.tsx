@@ -51,6 +51,39 @@ export function TraceTimeline({ trace }: TraceTimelineProps) {
     [duration, trace.spans, trace.startedAtMs],
   );
 
+  const diagnostics = useMemo(() => {
+    const slowest = [...trace.spans].sort(
+      (a, b) => b.durationMs - a.durationMs,
+    )[0];
+    const selfLeader = [...trace.spans].sort(
+      (a, b) => b.selfTimeMs - a.selfTimeMs,
+    )[0];
+
+    const events = trace.spans.flatMap((span) => [
+      { at: span.startMs, delta: 1 },
+      { at: span.endMs, delta: -1 },
+    ]);
+    events.sort(
+      (a, b) => a.at - b.at || a.delta - b.delta,
+    );
+
+    let active = 0;
+    let peakConcurrency = 0;
+    for (const event of events) {
+      active += event.delta;
+      peakConcurrency = Math.max(peakConcurrency, active);
+    }
+
+    return {
+      slowest,
+      selfLeader,
+      peakConcurrency,
+      errors: trace.spans.filter(
+        (span) => span.status === "error",
+      ).length,
+    };
+  }, [trace.spans]);
+
   return (
     <section className="timeline-shell" aria-label={t("timeline.aria")}>
       <div className="timeline-toolbar">
@@ -127,6 +160,41 @@ export function TraceTimeline({ trace }: TraceTimelineProps) {
             ms
           </span>
         </div>
+      </div>
+
+      <div className="timeline-diagnostics">
+        <article>
+          <small>{t("timeline.slowest")}</small>
+          <strong>{diagnostics.slowest?.service ?? "—"}</strong>
+          <span>
+            {diagnostics.slowest
+              ? formatNumber(diagnostics.slowest.durationMs, {
+                  maximumFractionDigits: 0,
+                }) + " ms"
+              : "—"}
+          </span>
+        </article>
+        <article>
+          <small>{t("timeline.selfLeader")}</small>
+          <strong>{diagnostics.selfLeader?.service ?? "—"}</strong>
+          <span>
+            {diagnostics.selfLeader
+              ? formatNumber(diagnostics.selfLeader.selfTimeMs, {
+                  maximumFractionDigits: 0,
+                }) + " ms"
+              : "—"}
+          </span>
+        </article>
+        <article>
+          <small>{t("timeline.peakConcurrency")}</small>
+          <strong>{formatNumber(diagnostics.peakConcurrency)}×</strong>
+          <span>{t("timeline.parallelSpans")}</span>
+        </article>
+        <article>
+          <small>{t("timeline.errors")}</small>
+          <strong>{formatNumber(diagnostics.errors)}</strong>
+          <span>{t("timeline.errorSpans")}</span>
+        </article>
       </div>
 
       <div className="timeline-list">
