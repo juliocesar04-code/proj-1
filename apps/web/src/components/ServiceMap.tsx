@@ -16,12 +16,14 @@ interface ServiceMapProps {
   services: ServiceNode[];
   edges: ServiceEdge[];
   suspectedService?: string | undefined;
+  onServiceSelect?: (service: string) => void;
 }
 
 export function ServiceMap({
   services,
   edges,
   suspectedService,
+  onServiceSelect,
 }: ServiceMapProps) {
   const { t, formatNumber } = useI18n();
   const radius = Math.max(170, services.length * 34);
@@ -115,6 +117,7 @@ export function ServiceMap({
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable
+        onNodeClick={(_, node) => onServiceSelect?.(node.id)}
         proOptions={{ hideAttribution: true }}
       >
         <Background gap={24} size={1} />
