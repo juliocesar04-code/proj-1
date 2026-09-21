@@ -18,3 +18,10 @@ createRoot(root).render(
     </I18nProvider>
   </StrictMode>,
 );
+
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    void navigator.serviceWorker.register("/sw.js");
+  });
+}
