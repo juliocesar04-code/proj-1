@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import Fastify from "fastify";
 import { z } from "zod";
 import { analyzeTrace, analyzeWindow } from "./analyze.js";
+import { parseOtlpJson } from "./otlp.js";
 import {
   clearSpans,
   getRecentSpans,
@@ -176,6 +177,46 @@ app.post("/api/spans", async (request, reply) => {
     traces: traceIds.length,
   });
 });
+
+async function ingestOtlp(request: { body: unknown }, reply: { code: (status: number) => { send: (body: unknown) => unknown } }) {
+  let spans: Span[];
+
+  try {
+    spans = parseOtlpJson(request.body);
+  } catch (error) {
+    return reply.code(400).send({
+      error: "invalid_otlp_payload",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Could not parse OTLP payload.",
+    });
+  }
+
+  if (spans.length > 5_000) {
+    return reply.code(413).send({
+      error: "otlp_batch_too_large",
+      maxSpans: 5_000,
+    });
+  }
+
+  await saveSpans(spans);
+
+  const traceIds = [...new Set(spans.map((span) => span.traceId))];
+  broadcast("ingest", {
+    protocol: "otlp-http-json",
+    spanCount: spans.length,
+    traceCount: traceIds.length,
+    at: Date.now(),
+  });
+
+  return reply.code(200).send({
+    partialSuccess: {},
+  });
+}
+
+app.post("/v1/traces", ingestOtlp);
+app.post("/api/otlp/v1/traces", ingestOtlp);
 
 app.get("/api/overview", async () => {
   const spans = await getRecentSpans(3_000);
