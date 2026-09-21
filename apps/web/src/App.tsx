@@ -124,6 +124,13 @@ export function App() {
   >("connecting");
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    document.title = "TraceForge — " + t("brand.subtitle");
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute("content", t("hero.copy"));
+  }, [t]);
+
   const refresh = useCallback(async () => {
     try {
       const [nextOverview, traceResponse] =
