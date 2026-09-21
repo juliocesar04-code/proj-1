@@ -14,7 +14,7 @@ import type {
 interface ServiceMapProps {
   services: ServiceNode[];
   edges: ServiceEdge[];
-  suspectedService?: string;
+  suspectedService?: string | undefined;
 }
 
 function serviceLabel(service: ServiceNode, suspected: boolean) {
