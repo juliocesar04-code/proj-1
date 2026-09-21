@@ -5,6 +5,7 @@ import {
   Database,
   Eraser,
   GitBranch,
+  Globe2,
   RefreshCw,
   Search,
   Server,
@@ -26,31 +27,36 @@ import {
 import { HypothesisPanel } from "./components/HypothesisPanel.js";
 import { ServiceMap } from "./components/ServiceMap.js";
 import { TraceTimeline } from "./components/TraceTimeline.js";
+import {
+  localeOptions,
+  useI18n,
+  type Locale,
+} from "./i18n.js";
 
 const scenarios: Array<{
   id: ScenarioId;
-  label: string;
-  hint: string;
+  labelKey: string;
+  hintKey: string;
 }> = [
   {
     id: "stable",
-    label: "Stable",
-    hint: "Healthy baseline",
+    labelKey: "scenario.stable.label",
+    hintKey: "scenario.stable.hint",
   },
   {
     id: "payment-timeout",
-    label: "Payment timeout",
-    hint: "Slow failing payment calls",
+    labelKey: "scenario.payment.label",
+    hintKey: "scenario.payment.hint",
   },
   {
     id: "database-lock",
-    label: "Database lock",
-    hint: "Blocked transaction path",
+    labelKey: "scenario.database.label",
+    hintKey: "scenario.database.hint",
   },
   {
     id: "cache-degradation",
-    label: "Cache degradation",
-    hint: "Redis latency and fallback",
+    labelKey: "scenario.cache.label",
+    hintKey: "scenario.cache.hint",
   },
 ];
 
@@ -67,12 +73,6 @@ const emptyOverview: Overview = {
   edges: [],
   hypotheses: [],
 };
-
-const timeFormatter = new Intl.DateTimeFormat(undefined, {
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-});
 
 function MetricCard({
   label,
@@ -98,6 +98,15 @@ function MetricCard({
 }
 
 export function App() {
+  const {
+    locale,
+    setLocale,
+    dir,
+    t,
+    formatNumber,
+    formatTime,
+  } = useI18n();
+
   const [overview, setOverview] =
     useState<Overview>(emptyOverview);
   const [traces, setTraces] = useState<TraceSummary[]>([]);
@@ -141,12 +150,12 @@ export function App() {
       setError(
         caught instanceof Error
           ? caught.message
-          : "Could not reach the TraceForge API.",
+          : t("error.api"),
       );
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void refresh();
@@ -179,7 +188,7 @@ export function App() {
           setError(
             caught instanceof Error
               ? caught.message
-              : "Could not load trace.",
+              : t("error.trace"),
           );
         }
       });
@@ -187,7 +196,7 @@ export function App() {
     return () => {
       cancelled = true;
     };
-  }, [selectedTraceId]);
+  }, [selectedTraceId, t]);
 
   const filteredTraces = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -218,7 +227,7 @@ export function App() {
       setError(
         caught instanceof Error
           ? caught.message
-          : "Scenario execution failed.",
+          : t("error.scenario"),
       );
     } finally {
       setBusyScenario(null);
@@ -233,7 +242,7 @@ export function App() {
       setError(
         caught instanceof Error
           ? caught.message
-          : "Could not clear data.",
+          : t("error.clear"),
       );
     }
   };
@@ -242,15 +251,15 @@ export function App() {
     overview.hypotheses[0]?.service;
 
   return (
-    <div className="app-shell">
+    <div className="app-shell" dir={dir}>
       <header className="topbar">
-        <a className="brand" href="#" aria-label="TraceForge home">
+        <a className="brand" href="#" aria-label="TraceForge">
           <span className="brand-mark">
             <GitBranch size={19} />
           </span>
           <span>
             <strong>TraceForge</strong>
-            <small>incident workbench</small>
+            <small>{t("brand.subtitle")}</small>
           </span>
         </a>
 
@@ -261,39 +270,56 @@ export function App() {
               "connection-dot--" + connection,
             ].join(" ")}
           />
-          <span>{connection}</span>
+          <span>{t("connection." + connection)}</span>
           <span className="topbar__divider" />
           <span>
             {overview.updatedAt
-              ? "synced " +
-                timeFormatter.format(overview.updatedAt)
-              : "waiting for data"}
+              ? t("synced", {
+                  time: formatTime(overview.updatedAt),
+                })
+              : t("waitingForData")}
           </span>
         </div>
+
+        <label className="language-picker" title={t("language")}>
+          <Globe2 size={15} />
+          <select
+            value={locale}
+            aria-label={t("language")}
+            onChange={(event) =>
+              setLocale(event.target.value as Locale)
+            }
+          >
+            {localeOptions.map((option) => (
+              <option key={option.code} value={option.code}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <button
           type="button"
           className="ghost-button"
           onClick={() => void refresh()}
           disabled={loading}
+          aria-label={t("refresh")}
         >
           <RefreshCw
             size={15}
             className={loading ? "spin" : ""}
           />
-          Refresh
+          <span>{t("refresh")}</span>
         </button>
       </header>
 
       <main>
         <section className="hero-strip">
           <div>
-            <p className="eyebrow">Distributed systems observability</p>
-            <h1>Find where the request really broke.</h1>
+            <p className="eyebrow">{t("hero.eyebrow")}</p>
+            <h1>{t("hero.title")}</h1>
             <p className="hero-strip__copy">
-              Reconstruct service calls, remove parallel wait time,
-              replay traces, and rank incident hypotheses using the
-              evidence already inside each span.
+              {t("hero.copy")}
             </p>
           </div>
 
@@ -308,8 +334,8 @@ export function App() {
                 }
                 disabled={busyScenario !== null}
               >
-                <span>{scenario.label}</span>
-                <small>{scenario.hint}</small>
+                <span>{t(scenario.labelKey)}</span>
+                <small>{t(scenario.hintKey)}</small>
                 {busyScenario === scenario.id ? (
                   <RefreshCw size={15} className="spin" />
                 ) : (
@@ -327,36 +353,48 @@ export function App() {
           </div>
         ) : null}
 
-        <section className="metrics-grid" aria-label="System metrics">
+        <section className="metrics-grid" aria-label={t("metrics.aria")}>
           <MetricCard
-            label="Traces"
-            value={String(overview.totals.traces)}
-            meta={overview.totals.spans + " spans loaded"}
+            label={t("metrics.traces")}
+            value={formatNumber(overview.totals.traces)}
+            meta={t("metrics.spansLoaded", {
+              count: formatNumber(overview.totals.spans),
+            })}
             icon={<GitBranch size={19} />}
           />
           <MetricCard
-            label="Services"
-            value={String(overview.totals.services)}
-            meta={overview.edges.length + " dependencies"}
+            label={t("metrics.services")}
+            value={formatNumber(overview.totals.services)}
+            meta={t("metrics.dependencies", {
+              count: formatNumber(overview.edges.length),
+            })}
             icon={<Boxes size={19} />}
           />
           <MetricCard
-            label="Error rate"
+            label={t("metrics.errorRate")}
             value={
-              (overview.totals.errorRate * 100).toFixed(1) + "%"
+              formatNumber(overview.totals.errorRate * 100, {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1,
+              }) + "%"
             }
-            meta={overview.totals.errors + " failing spans"}
+            meta={t("metrics.failingSpans", {
+              count: formatNumber(overview.totals.errors),
+            })}
             icon={<Server size={19} />}
           />
           <MetricCard
-            label="Top p95"
+            label={t("metrics.topP95")}
             value={
               overview.services[0]
-                ? overview.services[0].p95Ms.toFixed(0) + " ms"
+                ? formatNumber(overview.services[0].p95Ms, {
+                    maximumFractionDigits: 0,
+                  }) + " ms"
                 : "—"
             }
             meta={
-              overview.services[0]?.service ?? "no service data"
+              overview.services[0]?.service ??
+              t("metrics.noServiceData")
             }
             icon={<Database size={19} />}
           />
@@ -366,11 +404,13 @@ export function App() {
           <article className="panel panel--map">
             <div className="panel-heading">
               <div>
-                <p className="eyebrow">Live topology</p>
-                <h2>Service map</h2>
+                <p className="eyebrow">{t("topology")}</p>
+                <h2>{t("serviceMap")}</h2>
               </div>
               <span className="panel-chip">
-                {overview.edges.length} edges
+                {t("edges", {
+                  count: formatNumber(overview.edges.length),
+                })}
               </span>
             </div>
             <ServiceMap
@@ -383,8 +423,8 @@ export function App() {
           <article className="panel">
             <div className="panel-heading">
               <div>
-                <p className="eyebrow">Evidence ranking</p>
-                <h2>Incident hypothesis</h2>
+                <p className="eyebrow">{t("evidenceRanking")}</p>
+                <h2>{t("incidentHypothesis")}</h2>
               </div>
             </div>
             <HypothesisPanel
@@ -397,8 +437,8 @@ export function App() {
           <article className="panel trace-browser">
             <div className="panel-heading panel-heading--stackable">
               <div>
-                <p className="eyebrow">Request explorer</p>
-                <h2>Recent traces</h2>
+                <p className="eyebrow">{t("requestExplorer")}</p>
+                <h2>{t("recentTraces")}</h2>
               </div>
 
               <button
@@ -408,7 +448,7 @@ export function App() {
                 disabled={overview.totals.spans === 0}
               >
                 <Eraser size={14} />
-                Clear
+                {t("clear")}
               </button>
             </div>
 
@@ -417,7 +457,7 @@ export function App() {
                 <Search size={15} />
                 <input
                   type="search"
-                  placeholder="Search service, operation or trace"
+                  placeholder={t("searchPlaceholder")}
                   value={query}
                   onChange={(event) =>
                     setQuery(event.target.value)
@@ -438,7 +478,7 @@ export function App() {
                 }
               >
                 <CircleAlert size={14} />
-                Errors only
+                {t("errorsOnly")}
               </button>
             </div>
 
@@ -446,8 +486,8 @@ export function App() {
               {filteredTraces.length === 0 ? (
                 <div className="empty-state">
                   {traces.length === 0
-                    ? "Run a scenario to populate the explorer."
-                    : "No traces match the current filters."}
+                    ? t("empty.runScenario")
+                    : t("empty.noMatches")}
                 </div>
               ) : (
                 filteredTraces.map((trace) => (
@@ -480,14 +520,17 @@ export function App() {
                     </span>
                     <span className="trace-row__time">
                       <strong>
-                        {trace.durationMs.toFixed(0)} ms
+                        {formatNumber(trace.durationMs, {
+                          maximumFractionDigits: 0,
+                        })}{" "}
+                        ms
                       </strong>
                       <small>
-                        {trace.spanCount} spans
+                        {formatNumber(trace.spanCount)} spans
                       </small>
                     </span>
                     <span className="trace-row__stamp">
-                      {timeFormatter.format(trace.startedAtMs)}
+                      {formatTime(trace.startedAtMs)}
                     </span>
                   </button>
                 ))
@@ -500,11 +543,11 @@ export function App() {
               <>
                 <div className="panel-heading">
                   <div>
-                    <p className="eyebrow">Selected request</p>
+                    <p className="eyebrow">{t("selectedRequest")}</p>
                     <h2>
                       {selectedTrace.status === "error"
-                        ? "Failure replay"
-                        : "Trace replay"}
+                        ? t("failureReplay")
+                        : t("traceReplay")}
                     </h2>
                   </div>
                   <span className="trace-id-chip">
@@ -516,11 +559,8 @@ export function App() {
             ) : (
               <div className="trace-detail__empty">
                 <TimerReset size={28} />
-                <h3>No trace selected</h3>
-                <p>
-                  Choose a request from the explorer to inspect
-                  its call timeline and self-time.
-                </p>
+                <h3>{t("noTraceSelected")}</h3>
+                <p>{t("chooseRequest")}</p>
               </div>
             )}
           </article>
@@ -529,9 +569,7 @@ export function App() {
 
       <footer>
         <span>TraceForge</span>
-        <span>
-          deterministic scenarios · evidence-first analysis
-        </span>
+        <span>{t("footer")}</span>
       </footer>
     </div>
   );
