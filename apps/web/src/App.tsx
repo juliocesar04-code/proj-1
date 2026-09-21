@@ -2,9 +2,12 @@ import {
   Activity,
   Boxes,
   CircleAlert,
+  Command,
   Database,
   Eraser,
+  FileText,
   GitBranch,
+  GitCompareArrows,
   Globe2,
   RefreshCw,
   Search,
@@ -24,8 +27,12 @@ import {
   type TraceAnalysis,
   type TraceSummary,
 } from "./api.js";
+import { CommandPalette } from "./components/CommandPalette.js";
+import { HealthStrip } from "./components/HealthStrip.js";
 import { HypothesisPanel } from "./components/HypothesisPanel.js";
+import { IncidentReport } from "./components/IncidentReport.js";
 import { ServiceMap } from "./components/ServiceMap.js";
+import { TraceCompare } from "./components/TraceCompare.js";
 import { TraceTimeline } from "./components/TraceTimeline.js";
 import {
   localeOptions,
@@ -123,6 +130,11 @@ export function App() {
     "connecting" | "live" | "offline"
   >("connecting");
   const [error, setError] = useState<string | null>(null);
+  const [commandOpen, setCommandOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [activeScenario, setActiveScenario] =
+    useState<ScenarioId>("payment-timeout");
 
   useEffect(() => {
     document.title = "TraceForge — " + t("brand.subtitle");
@@ -224,6 +236,7 @@ export function App() {
 
   const runScenario = async (scenario: ScenarioId) => {
     setBusyScenario(scenario);
+    setActiveScenario(scenario);
     setError(null);
 
     try {
@@ -288,6 +301,18 @@ export function App() {
           </span>
         </div>
 
+        <button
+          type="button"
+          className="command-trigger"
+          onClick={() => setCommandOpen(true)}
+          aria-label={t("command.title")}
+          title={t("command.title")}
+        >
+          <Command size={15} />
+          <span>{t("command.shortLabel")}</span>
+          <kbd>⌘K</kbd>
+        </button>
+
         <label className="language-picker" title={t("language")}>
           <Globe2 size={15} />
           <select
@@ -335,7 +360,14 @@ export function App() {
               <button
                 key={scenario.id}
                 type="button"
-                className="scenario-button"
+                className={[
+                  "scenario-button",
+                  activeScenario === scenario.id
+                    ? "scenario-button--active"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
                 onClick={() =>
                   void runScenario(scenario.id)
                 }
@@ -352,6 +384,12 @@ export function App() {
             ))}
           </div>
         </section>
+
+        <HealthStrip
+          overview={overview}
+          traces={traces}
+          onOpenReport={() => setReportOpen(true)}
+        />
 
         {error ? (
           <div className="error-banner" role="alert">
@@ -548,7 +586,7 @@ export function App() {
           <article className="panel trace-detail">
             {selectedTrace ? (
               <>
-                <div className="panel-heading">
+                <div className="panel-heading panel-heading--trace">
                   <div>
                     <p className="eyebrow">{t("selectedRequest")}</p>
                     <h2>
@@ -557,9 +595,28 @@ export function App() {
                         : t("traceReplay")}
                     </h2>
                   </div>
-                  <span className="trace-id-chip">
-                    {selectedTrace.traceId.slice(0, 8)}
-                  </span>
+                  <div className="trace-actions">
+                    <button
+                      type="button"
+                      className="compact-action"
+                      onClick={() => setCompareOpen(true)}
+                      disabled={traces.length < 2}
+                    >
+                      <GitCompareArrows size={14} />
+                      {t("compare.short")}
+                    </button>
+                    <button
+                      type="button"
+                      className="compact-action"
+                      onClick={() => setReportOpen(true)}
+                    >
+                      <FileText size={14} />
+                      {t("report.short")}
+                    </button>
+                    <span className="trace-id-chip">
+                      {selectedTrace.traceId.slice(0, 8)}
+                    </span>
+                  </div>
                 </div>
                 <TraceTimeline trace={selectedTrace} />
               </>
@@ -578,6 +635,32 @@ export function App() {
         <span>TraceForge</span>
         <span>{t("footer")}</span>
       </footer>
+
+      <CommandPalette
+        open={commandOpen}
+        onOpenChange={setCommandOpen}
+        onRefresh={() => void refresh()}
+        onScenario={(scenario) => void runScenario(scenario)}
+        onReport={() => setReportOpen(true)}
+        onCompare={() => setCompareOpen(true)}
+        canCompare={selectedTrace !== null && traces.length > 1}
+      />
+
+      {reportOpen ? (
+        <IncidentReport
+          overview={overview}
+          trace={selectedTrace}
+          onClose={() => setReportOpen(false)}
+        />
+      ) : null}
+
+      {compareOpen && selectedTrace ? (
+        <TraceCompare
+          baseTrace={selectedTrace}
+          traces={traces}
+          onClose={() => setCompareOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }
