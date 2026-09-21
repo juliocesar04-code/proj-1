@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build -w @traceforge/web",
+  "outputDirectory": "apps/web/dist",
+  "installCommand": "npm install --no-audit --no-fund",
+  "framework": "vite"
+}
