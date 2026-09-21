@@ -1,4 +1,4 @@
-import { demoOverview, demoTrace, demoTraces } from "./demo.js";
+import { buildDemoScenario, buildEmptyDemo } from "./demo.js";
 
 export type SpanStatus = "ok" | "error" | "unset";
 
@@ -93,6 +93,8 @@ const demoMode =
   (typeof window !== "undefined" &&
     window.location.hostname.endsWith(".vercel.app"));
 
+let demoState = buildDemoScenario("payment-timeout");
+
 async function request<T>(
   path: string,
   init?: RequestInit,
@@ -122,29 +124,36 @@ async function request<T>(
 export const api = {
   overview: () =>
     demoMode
-      ? Promise.resolve(demoOverview)
+      ? Promise.resolve(demoState.overview)
       : request<Overview>("/api/overview"),
 
   traces: (limit = 80) =>
     demoMode
-      ? Promise.resolve({ traces: demoTraces.slice(0, limit) })
+      ? Promise.resolve({ traces: demoState.traces.slice(0, limit) })
       : request<{ traces: TraceSummary[] }>(
           "/api/traces?limit=" + encodeURIComponent(String(limit)),
         ),
 
   trace: (traceId: string) =>
     demoMode
-      ? Promise.resolve({ ...demoTrace, traceId })
+      ? Promise.resolve(
+          demoState.traceById[traceId] ??
+            Object.values(demoState.traceById)[0] ??
+            Promise.reject(new Error("Trace not found.")),
+        )
       : request<TraceAnalysis>(
           "/api/traces/" + encodeURIComponent(traceId),
         ),
 
   runScenario: (scenario: ScenarioId, traces = 24) =>
     demoMode
-      ? Promise.resolve({
-          scenario,
-          spans: traces * 7,
-          traces,
+      ? Promise.resolve().then(() => {
+          demoState = buildDemoScenario(scenario, traces);
+          return {
+            scenario,
+            spans: demoState.overview.totals.spans,
+            traces: demoState.overview.totals.traces,
+          };
         })
       : request<{
           scenario: ScenarioId;
@@ -157,7 +166,9 @@ export const api = {
 
   clear: () =>
     demoMode
-      ? Promise.resolve()
+      ? Promise.resolve().then(() => {
+          demoState = buildEmptyDemo();
+        })
       : request<void>("/api/data", {
           method: "DELETE",
         }),
