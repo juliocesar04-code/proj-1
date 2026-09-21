@@ -9,6 +9,7 @@ import {
   GitBranch,
   GitCompareArrows,
   Globe2,
+  Link2,
   RefreshCw,
   Search,
   Server,
@@ -31,6 +32,7 @@ import { CommandPalette } from "./components/CommandPalette.js";
 import { HealthStrip } from "./components/HealthStrip.js";
 import { HypothesisPanel } from "./components/HypothesisPanel.js";
 import { IncidentReport } from "./components/IncidentReport.js";
+import { ServiceInspector } from "./components/ServiceInspector.js";
 import { ServiceMap } from "./components/ServiceMap.js";
 import { TraceCompare } from "./components/TraceCompare.js";
 import { TraceTimeline } from "./components/TraceTimeline.js";
@@ -118,7 +120,10 @@ export function App() {
     useState<Overview>(emptyOverview);
   const [traces, setTraces] = useState<TraceSummary[]>([]);
   const [selectedTraceId, setSelectedTraceId] =
-    useState<string | null>(null);
+    useState<string | null>(() => {
+      if (typeof window === "undefined") return null;
+      return new URLSearchParams(window.location.search).get("trace");
+    });
   const [selectedTrace, setSelectedTrace] =
     useState<TraceAnalysis | null>(null);
   const [query, setQuery] = useState("");
@@ -133,6 +138,9 @@ export function App() {
   const [commandOpen, setCommandOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [selectedService, setSelectedService] =
+    useState<string | null>(null);
+  const [shareCopied, setShareCopied] = useState(false);
   const [activeScenario, setActiveScenario] =
     useState<ScenarioId>("payment-timeout");
 
@@ -190,6 +198,18 @@ export function App() {
   }, [refresh]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    if (selectedTraceId) {
+      url.searchParams.set("trace", selectedTraceId);
+    } else {
+      url.searchParams.delete("trace");
+    }
+    window.history.replaceState({}, "", url);
+  }, [selectedTraceId]);
+
+  useEffect(() => {
     if (!selectedTraceId) {
       setSelectedTrace(null);
       return;
@@ -237,6 +257,8 @@ export function App() {
   const runScenario = async (scenario: ScenarioId) => {
     setBusyScenario(scenario);
     setActiveScenario(scenario);
+    setSelectedService(null);
+    setCompareOpen(false);
     setError(null);
 
     try {
@@ -252,6 +274,16 @@ export function App() {
     } finally {
       setBusyScenario(null);
     }
+  };
+
+  const shareTrace = async () => {
+    if (!selectedTraceId || typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    url.searchParams.set("trace", selectedTraceId);
+    await navigator.clipboard.writeText(url.toString());
+    setShareCopied(true);
+    window.setTimeout(() => setShareCopied(false), 1600);
   };
 
   const clearData = async () => {
@@ -462,6 +494,7 @@ export function App() {
               services={overview.services}
               edges={overview.edges}
               suspectedService={suspectedService}
+              onServiceSelect={setSelectedService}
             />
           </article>
 
@@ -608,6 +641,14 @@ export function App() {
                     <button
                       type="button"
                       className="compact-action"
+                      onClick={() => void shareTrace()}
+                    >
+                      <Link2 size={14} />
+                      {shareCopied ? t("trace.copied") : t("trace.share")}
+                    </button>
+                    <button
+                      type="button"
+                      className="compact-action"
                       onClick={() => setReportOpen(true)}
                     >
                       <FileText size={14} />
@@ -659,6 +700,14 @@ export function App() {
           baseTrace={selectedTrace}
           traces={traces}
           onClose={() => setCompareOpen(false)}
+        />
+      ) : null}
+
+      {selectedService ? (
+        <ServiceInspector
+          serviceName={selectedService}
+          overview={overview}
+          onClose={() => setSelectedService(null)}
         />
       ) : null}
     </div>
