@@ -1,0 +1,48 @@
+name: corvodb
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "corvodb/**"
+      - ".github/workflows/corvodb.yml"
+  pull_request:
+    paths:
+      - "corvodb/**"
+      - ".github/workflows/corvodb.yml"
+
+defaults:
+  run:
+    working-directory: corvodb
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          # O módulo não tem dependências, logo não há go.sum para o cache.
+          cache: false
+
+      - name: Formatação
+        run: test -z "$(gofmt -l .)" || (gofmt -l .; exit 1)
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Build
+        run: go build ./...
+
+      - name: Testes
+        run: go test -race -count=1 ./...
+
+      - name: Cobertura
+        run: |
+          go test -coverprofile=coverage.out ./...
+          go tool cover -func=coverage.out | tail -1
+
+      - name: Fuzzing do parser
+        run: go test -run XXX -fuzz FuzzParse -fuzztime 30s ./internal/sql
