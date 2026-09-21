@@ -1,0 +1,2 @@
+go test fuzz v1
+string("EXPLAIN\bROM t GROUP BY a HAVING COUNT(*) > I")

@@ -162,3 +162,15 @@ Implemented and passing CI:
 - PWA/offline shell
 - responsive design
 - automated type checking, tests and production builds
+
+---
+
+## Also in this repository
+
+### CorvoDB (`corvodb/`)
+
+A relational database engine written from scratch in Go, with no external
+dependencies: 4 KB paged file, B+ tree, write-ahead log with crash recovery,
+its own SQL parser, a planner that picks indexes, and an iterator-model
+executor. It is a separate project with its own Go module and its own CI
+workflow; see [corvodb/README.md](corvodb/README.md).
