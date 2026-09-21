@@ -1,12 +1,14 @@
 import { Pause, Play, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { TraceAnalysis } from "../api.js";
+import { useI18n } from "../i18n.js";
 
 interface TraceTimelineProps {
   trace: TraceAnalysis;
 }
 
 export function TraceTimeline({ trace }: TraceTimelineProps) {
+  const { t, formatNumber } = useI18n();
   const [progress, setProgress] = useState(0);
   const [playing, setPlaying] = useState(false);
 
@@ -50,14 +52,23 @@ export function TraceTimeline({ trace }: TraceTimelineProps) {
   );
 
   return (
-    <section className="timeline-shell" aria-label="Trace replay timeline">
+    <section className="timeline-shell" aria-label={t("timeline.aria")}>
       <div className="timeline-toolbar">
         <div>
-          <p className="eyebrow">Request replay</p>
+          <p className="eyebrow">{t("timeline.requestReplay")}</p>
           <div className="timeline-title-row">
-            <strong>{trace.durationMs.toFixed(1)} ms</strong>
+            <strong>
+              {formatNumber(trace.durationMs, {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1,
+              })}{" "}
+              ms
+            </strong>
             <span>
-              {trace.spans.length} spans · {trace.services.length} services
+              {t("timeline.spansServices", {
+                spans: formatNumber(trace.spans.length),
+                services: formatNumber(trace.services.length),
+              })}
             </span>
           </div>
         </div>
@@ -70,7 +81,7 @@ export function TraceTimeline({ trace }: TraceTimelineProps) {
               setProgress(0);
               setPlaying(false);
             }}
-            aria-label="Restart replay"
+            aria-label={t("timeline.restart")}
           >
             <RotateCcw size={16} />
           </button>
@@ -83,14 +94,14 @@ export function TraceTimeline({ trace }: TraceTimelineProps) {
             }}
           >
             {playing ? <Pause size={16} /> : <Play size={16} />}
-            {playing ? "Pause" : "Replay"}
+            {playing ? t("timeline.pause") : t("timeline.replay")}
           </button>
         </div>
       </div>
 
       <div className="scrubber">
         <input
-          aria-label="Replay position"
+          aria-label={t("timeline.position")}
           type="range"
           min="0"
           max="100"
@@ -103,8 +114,18 @@ export function TraceTimeline({ trace }: TraceTimelineProps) {
         />
         <div className="scrubber__meta">
           <span>0 ms</span>
-          <span>{((duration * progress) / 100).toFixed(0)} ms</span>
-          <span>{duration.toFixed(0)} ms</span>
+          <span>
+            {formatNumber((duration * progress) / 100, {
+              maximumFractionDigits: 0,
+            })}{" "}
+            ms
+          </span>
+          <span>
+            {formatNumber(duration, {
+              maximumFractionDigits: 0,
+            })}{" "}
+            ms
+          </span>
         </div>
       </div>
 
@@ -129,8 +150,9 @@ export function TraceTimeline({ trace }: TraceTimelineProps) {
               <div
                 className="timeline-row__label"
                 style={{
-                  paddingLeft:
+                  paddingInlineStart:
                     10 + Math.min(span.depth, 5) * 12,
+                  paddingInlineEnd: 8,
                 }}
               >
                 <span
@@ -164,7 +186,10 @@ export function TraceTimeline({ trace }: TraceTimelineProps) {
                   title={
                     span.service +
                     " · " +
-                    span.durationMs.toFixed(1) +
+                    formatNumber(span.durationMs, {
+                      minimumFractionDigits: 1,
+                      maximumFractionDigits: 1,
+                    }) +
                     " ms"
                   }
                 />
@@ -175,8 +200,19 @@ export function TraceTimeline({ trace }: TraceTimelineProps) {
               </div>
 
               <div className="timeline-row__numbers">
-                <span>{span.durationMs.toFixed(0)} ms</span>
-                <small>{span.selfTimeMs.toFixed(0)} self</small>
+                <span>
+                  {formatNumber(span.durationMs, {
+                    maximumFractionDigits: 0,
+                  })}{" "}
+                  ms
+                </span>
+                <small>
+                  {t("timeline.self", {
+                    value: formatNumber(span.selfTimeMs, {
+                      maximumFractionDigits: 0,
+                    }) + " ms",
+                  })}
+                </small>
               </div>
             </div>
           );
