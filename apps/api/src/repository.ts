@@ -52,8 +52,8 @@ export async function saveSpans(spans: Span[]): Promise<void> {
     attributes: span.attributes,
   }));
 
-  await sql\`
-    INSERT INTO spans \${sql(
+  await sql`
+    INSERT INTO spans ${sql(
       rows,
       "trace_id",
       "span_id",
@@ -74,11 +74,11 @@ export async function saveSpans(spans: Span[]): Promise<void> {
       duration_ms = EXCLUDED.duration_ms,
       status = EXCLUDED.status,
       attributes = EXCLUDED.attributes
-  \`;
+  `;
 }
 
 export async function getTrace(traceId: string): Promise<Span[]> {
-  const rows = await sql<SpanRow[]>\`
+  const rows = await sql<SpanRow[]>`
     SELECT
       trace_id,
       span_id,
@@ -90,16 +90,16 @@ export async function getTrace(traceId: string): Promise<Span[]> {
       status,
       attributes
     FROM spans
-    WHERE trace_id = \${traceId}
+    WHERE trace_id = ${traceId}
     ORDER BY start_ms ASC, duration_ms DESC
-  \`;
+  `;
 
   return rows.map(fromRow);
 }
 
 export async function getRecentSpans(limit = 3_000): Promise<Span[]> {
   const bounded = Math.min(Math.max(limit, 1), 10_000);
-  const rows = await sql<SpanRow[]>\`
+  const rows = await sql<SpanRow[]>`
     SELECT
       trace_id,
       span_id,
@@ -112,12 +112,12 @@ export async function getRecentSpans(limit = 3_000): Promise<Span[]> {
       attributes
     FROM spans
     ORDER BY start_ms DESC
-    LIMIT \${bounded}
-  \`;
+    LIMIT ${bounded}
+  `;
 
   return rows.map(fromRow);
 }
 
 export async function clearSpans(): Promise<void> {
-  await sql\`TRUNCATE TABLE spans\`;
+  await sql`TRUNCATE TABLE spans`;
 }
